@@ -1,0 +1,54 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "mongodb"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+    id    String  @id @default(auto()) @map("_id") @db.ObjectId
+    email String  @unique
+    password String
+    name  String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    house House[]
+}
+
+model House{
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    published Boolean  @default(false)
+    author     User       @relation(fields: [authorId], references: [id])
+    authorId   String @db.ObjectId
+    name String
+    about String
+    generalInfo String[]
+    type Type @relation(fields: [typeId], references: [id])
+    typeId String @db.ObjectId
+    city City @relation(fields: [cityId], references: [id])
+    cityId String @db.ObjectId
+    address String
+    cost Float
+    contact String
+}
+
+model Type {
+    id    String @id @default(auto()) @map("_id") @db.ObjectId
+    value String @unique
+    name  String @unique
+    houses House[]
+}
+
+model City {
+    id String @id @default(auto()) @map("_id") @db.ObjectId
+    value String @unique
+    name String @unique
+    houses House[]
+}
