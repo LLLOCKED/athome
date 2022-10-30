@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import {validationResult} from "express-validator";
 const jwt = require("jsonwebtoken");
 
 const bcrypt = require("../utils/bcrypt");
@@ -17,6 +18,11 @@ function generateAccessToken(id: string, name: string, email: string) {
 
 async function postRegistration(req: Request, res: Response) {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() })
+    }
+
     const { email, password, name } = req.body;
 
     const existsUser = await prisma.user.findUnique({
@@ -44,6 +50,10 @@ async function postRegistration(req: Request, res: Response) {
 
 async function postLogin(req: Request, res: Response) {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(422).json({ errors: errors.array() })
+    }
     const { email, password } = req.body;
 
     const existsUser = await prisma.user.findUnique({
@@ -85,21 +95,9 @@ async function getIsAuth(req: Request, res: Response) {
   }
 }
 
-async function logout(req: Request, res: Response) {
-  try {
-    return res
-      .clearCookie("access_token")
-      .status(200)
-      .json({ message: "Successfully logged out 😏 🍀" });
-  } catch (error) {
-    console.log(error);
-    res.status(400).json({ message: "Error" });
-  }
-}
 
 module.exports = {
   postRegistration,
   postLogin,
   getIsAuth,
-  logout,
 };

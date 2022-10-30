@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const express_validator_1 = require("express-validator");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("../utils/bcrypt");
 const { PrismaClient } = require("@prisma/client");
@@ -24,6 +25,10 @@ function generateAccessToken(id, name, email) {
 function postRegistration(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
+            const errors = (0, express_validator_1.validationResult)(req);
+            if (!errors.isEmpty()) {
+                return res.status(422).json({ errors: errors.array() });
+            }
             const { email, password, name } = req.body;
             const existsUser = yield prisma.user.findUnique({
                 where: {
@@ -51,6 +56,10 @@ function postRegistration(req, res) {
 function postLogin(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
+            const errors = (0, express_validator_1.validationResult)(req);
+            if (!errors.isEmpty()) {
+                return res.status(422).json({ errors: errors.array() });
+            }
             const { email, password } = req.body;
             const existsUser = yield prisma.user.findUnique({
                 where: {
@@ -89,23 +98,8 @@ function getIsAuth(req, res) {
         }
     });
 }
-function logout(req, res) {
-    return __awaiter(this, void 0, void 0, function* () {
-        try {
-            return res
-                .clearCookie("access_token")
-                .status(200)
-                .json({ message: "Successfully logged out 😏 🍀" });
-        }
-        catch (error) {
-            console.log(error);
-            res.status(400).json({ message: "Error" });
-        }
-    });
-}
 module.exports = {
     postRegistration,
     postLogin,
     getIsAuth,
-    logout,
 };

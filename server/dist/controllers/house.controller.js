@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const { validationResult } = require('express-validator');
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 function getMyHouses(req, res) {
@@ -121,4 +122,45 @@ function getHousesByUser(req, res) {
         }
     });
 }
-module.exports = { getMyHouses, getAllHouses, getHousesByUser };
+function createHouse(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                return res.status(422).json({ errors: errors.array() });
+            }
+            const { name, about, generalInfo, address, cost, contact, city, type } = req.body;
+            const house = yield prisma.house.create({
+                data: {
+                    name: name,
+                    about: about,
+                    generalInfo: generalInfo,
+                    address: address,
+                    cost: cost,
+                    contact: contact,
+                    city: {
+                        connect: {
+                            value: city
+                        }
+                    },
+                    type: {
+                        connect: {
+                            value: type
+                        }
+                    },
+                    author: {
+                        connect: {
+                            id: req.user
+                        }
+                    }
+                }
+            });
+            res.status(200).json({ message: "House created", houses: house });
+        }
+        catch (error) {
+            console.log(error);
+            res.status(400).json({ message: "Error create house" });
+        }
+    });
+}
+module.exports = { getMyHouses, getAllHouses, getHousesByUser, createHouse };
