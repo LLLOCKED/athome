@@ -113,6 +113,20 @@ async function getHousesByUser(req: Request, res: Response) {
     }
 }
 
+async function getHouse(req:Request, res: Response){
+    try {
+        const house  = await prisma.house.findUnique({
+            where:{
+                id: req.params.hid
+            }
+        })
+        res.status(200).json({house: house})
+    }catch (error) {
+        console.log(error);
+        res.status(400).json({message: "Error get house"})
+    }
+}
+
 async function createHouse(req:Request, res:Response){
     try {
         const errors = validationResult(req);
@@ -153,4 +167,4 @@ async function createHouse(req:Request, res:Response){
     }
 }
 
-module.exports = {getMyHouses, getAllHouses, getHousesByUser, createHouse}
+module.exports = {getMyHouses, getAllHouses, getHousesByUser, createHouse, getHouse}

@@ -122,6 +122,22 @@ function getHousesByUser(req, res) {
         }
     });
 }
+function getHouse(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const house = yield prisma.house.findUnique({
+                where: {
+                    id: req.params.hid
+                }
+            });
+            res.status(200).json({ house: house });
+        }
+        catch (error) {
+            console.log(error);
+            res.status(400).json({ message: "Error get house" });
+        }
+    });
+}
 function createHouse(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -163,4 +179,4 @@ function createHouse(req, res) {
         }
     });
 }
-module.exports = { getMyHouses, getAllHouses, getHousesByUser, createHouse };
+module.exports = { getMyHouses, getAllHouses, getHousesByUser, createHouse, getHouse };
