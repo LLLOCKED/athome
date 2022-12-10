@@ -118,9 +118,36 @@ async function getHouse(req:Request, res: Response){
         const house  = await prisma.house.findUnique({
             where:{
                 id: req.params.hid
+            },
+            select: {
+                id: true,
+                name: true,
+                author: {
+                    select:{
+                        name: true
+                    }
+                },
+                generalInfo: true,
+                city: {
+                    select:{
+                        name: true
+                    }
+                },
+                type: {
+                    select:{
+                        name: true
+                    }
+                },
+                address: true,
+                about: true,
+                cost: true,
+                contact: true,
+                published: true,
+                createdAt: true,
+                updatedAt: true,
             }
         })
-        res.status(200).json({house: house})
+        res.status(200).json({...house})
     }catch (error) {
         console.log(error);
         res.status(400).json({message: "Error get house"})
